@@ -1,0 +1,19 @@
+${AnsiColor.BRIGHT_BLUE}                      
+${AnsiColor.BRIGHT_BLUE} █████╗ █████╗ █████╗ 
+${AnsiColor.BRIGHT_BLUE} ╚════╝ ╚════╝ ╚════╝ 
+
+${AnsiColor.DEFAULT}::${AnsiColor.BRIGHT_BLUE} MAGO-GEO-BASE-REFERENCIA ${AnsiColor.DEFAULT}:: ${AnsiColor.RED}${spring.application.name}${AnsiColor.BRIGHT_BLUE}:${spring.application.version}${AnsiColor.DEFAULT} ::
+
+${AnsiColor.GREEN}             ________
+${AnsiColor.GREEN}         ,o88~~88888888o,
+${AnsiColor.GREEN}       ,~~?8P  88888     8,
+${AnsiColor.GREEN}      d  d88 d88 d8_88     b
+${AnsiColor.GREEN}     d  d888888888          b
+${AnsiColor.GREEN}     8,?88888888  d8.b o.   8
+${AnsiColor.GREEN}     8~88888888~ ~^8888\ db 8
+${AnsiColor.GREEN}     ?  888888          ,888P
+${AnsiColor.GREEN}      ?  `8888b,_      d888P
+${AnsiColor.GREEN}       `   8888888b   ,888'
+${AnsiColor.GREEN}         ~-?8888888 _.P-~     
+${AnsiColor.GREEN}              ~~~~~~
+${AnsiColor.DEFAULT}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd"
+         name="Apache Maven">
+
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.8</version>
+    </skin>
+    <custom>
+        <fluidoSkin>
+            <breadcrumbDivider>»</breadcrumbDivider>
+        </fluidoSkin>
+    </custom>
+
+    <bannerLeft>
+        <name>${project.name}</name>
+        <src>images/apache-maven-project.png</src>
+        <href>https://maven.apache.org/</href>
+    </bannerLeft>
+
+    <bannerRight>
+        <src>images/orgao-logo.png</src>
+    </bannerRight>
+
+    <publishDate position="right" format="MMMM dd, yyyy"/>
+    <version/>
+    <poweredBy>
+        <logo img="images/mago-brasao.png" alt="Secretaria do Meio Ambiente"/>
+    </poweredBy>
+
+    <edit>${project.scm.url}</edit>
+
+    <body>
+        <breadcrumbs>
+            <item name="Ref" href="../" />
+            <item name="${project.artifactId} ${project.version}" href="./" />
+        </breadcrumbs>
+
+        <menu ref="parent"/>
+        <menu ref="modules"/>
+        <menu ref="reports"/>
+        <menu name="Other Reports">
+            <item name="Cucumber Reports" href="cucumber-html-reports/overview-features.html"/>
+            <item name="Clover PDF" href="clover/clover.pdf"/>
+            <item name="Clover XML" href="clover/clover.xml"/>
+        </menu>
+        <footer><![CDATA[Governo do Estado de Goiás<br> Secretaria de Estado do Meio Ambiente e Desenvolvimento Sustentável - All rights reserved.]]></footer>
+    </body>
+</project>

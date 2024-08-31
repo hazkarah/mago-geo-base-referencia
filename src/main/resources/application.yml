@@ -1,0 +1,65 @@
+info:
+  build:
+    artifact: '@artifactId@'
+    name: '@name@'
+    description: '@description@'
+    version: '@version@'
+
+#Context
+server:
+  servlet:
+    context-path: /
+  port: 8080
+
+  tomcat:
+    connection-timeout: 120000
+    keep-alive-timeout: 120000
+    max-wait: 100
+    max-active: 50
+    max-idle: 20
+    min-idle: 15
+
+spring:
+  application:
+    name: '@artifactId@'
+    version: '@version@'
+  mvc:
+    throw-exception-if-no-handler-found: true
+  output:
+    ansi:
+      enabled: ALWAYS
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 30MB
+      max-request-size: 30MB
+  datasource:
+      hikari:
+        connection-timeout: ${DATABASE_CONNECTION_TIMEOUT:60000}
+        minimum-idle: ${DATABASE_CONNECTION_MININUM_IDLE:10}
+        maximum-pool-size: ${DATABASE_CONNECTION_MAX_POOL_SIZE:50}
+        idle-timeout: ${DATABASE_CONNECTION_IDLE_TIMEOUT:60000}
+        max-lifetime: ${DATABASE_CONNECTION_MAX_LIFETIME:240000}
+        data-source-properties:
+          oracle.net.CONNECT_TIMEOUT: ${DATABASE_CONNECTION_TIMEOUT:120000}
+          oracle.net.READ_TIMEOUT: ${DATABASE_READ_TIMEOUT:240000}
+          oracle.jdbc.ReadTimeout: ${DATABASE_READ_TIMEOUT:240000}
+
+format:
+  data: '"dd-MM-yyyy hh:mm:ss"'
+
+geoserver:
+  url: 'http://geo.mago.go.gov.br/geoserver/ows?service=wms'
+  authToken: 541085de-9a2e-454e-bdba-eb3d57a2f492
+
+
+#Logging
+logging:
+  level:
+    com:
+      zaxxer:
+        hikari: DEBUG

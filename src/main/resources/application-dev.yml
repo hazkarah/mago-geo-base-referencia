@@ -1,0 +1,73 @@
+#Context
+server:
+  servlet:
+    context-path: /
+  port: 8087
+
+
+#Database
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: 'jdbc:oracle:thin:@scan-prod:1521/oramago'
+    username: SIGA2_BASE_REFERENCIA_GEO
+    password: "Guaxupita#SIGA2_BASE"
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    database: oracle
+    open-in-view: false
+    generate-ddl: off
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect
+        default_schema: BASE_REFERENCIA_GEO
+        format_sql: true
+        spatial:
+          connection_finder: br.gov.go.mago.geobasereferencia.config.OracleConnectionFinderConfig
+
+#Logging
+logging:
+  level:
+    net:
+      sf:
+        ehcache: debug
+    br:
+      gov.go.mago.geoportalbasereferencia: debug
+    org:
+      springframework:
+        web: debug
+
+
+
+#Security
+security:
+  authorization:
+    token:
+      authorizationCookie:
+        cookieName: br.gov.go.mago.dev.authorization
+        domainName: apps.ocp.mago.go.gov.br
+        httpOnly: true
+        secure: false
+      identityCookie:
+        cookieName: br.gov.go.mago.dev.identity
+      keys:
+        accessTokenKey: BXt36hQvrmLOBsxHW2JcIQybZPrMzAtK
+        refreshTokenKey: GzZory0W5DaHpV5yWBrUcoqhv008at5I
+      storage:
+        redis:
+          namespace: br.gov.go.mago.AuthenticatedUser
+          host: redis-desenv.apps.ocp.mago.go.gov.br
+          port: 6379
+          password: V40vCkLhdhVJ2qS5
+  accessControl:
+    allowOrigins: '*'
+  identityService:
+    uri: http://api.portal-server-desenv.apps.ocp.mago.go.gov.br
+
+geoserver:
+  url: 'http://geo.mago.go.gov.br/geoserver/ows?service=wms'
+  authToken: 541085de-9a2e-454e-bdba-eb3d57a2f492
