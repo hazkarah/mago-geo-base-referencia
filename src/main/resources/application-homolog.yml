@@ -170,3 +170,7 @@ app:
       params:
         startAt: "2024-08-16T00:00:00Z"
 
+
+geoserver:
+  url: 'https://sigahomol.meioambiente.go.gov.br/geoserver/ows?service=wms'
+  authToken: ''

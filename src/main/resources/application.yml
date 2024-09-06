@@ -181,10 +181,10 @@ app:
 format:
   data: '"dd-MM-yyyy hh:mm:ss"'
 
-geoserver:
-  url: 'http://geo.mago.go.gov.br/geoserver/ows?service=wms'
-  authToken: 541085de-9a2e-454e-bdba-eb3d57a2f492
 
+geoserver:
+  url: 'https://sigahomol.meioambiente.go.gov.br/geoserver/ows?service=wms'
+  authToken: ''
 
 #Logging
 logging:
