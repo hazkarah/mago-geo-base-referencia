@@ -19,7 +19,7 @@
     <description>Projeto ${project.artifactId}-${project.version}</description>
     <url>http://site.${project.artifactId}${openshif.wildcard}</url>
     <organization>
-        <name>Secretaria de Estado DO Meio Ambiente</name>
+        <name>Secretaria de Estado do Meio Ambiente</name>
         <url>http://www.meioambiente.go.gov.br/</url>
     </organization>
 
@@ -210,7 +210,22 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson</artifactId>
+            <version>31.2</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-referencing</artifactId>
+            <version>31.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-opengis</artifactId>
+            <version>29.6</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -222,7 +237,7 @@
             <artifactId>si-quantity</artifactId>
             <version>2.0.1</version>
         </dependency>
-  
+
         <dependency>
             <groupId>tech.units</groupId>
             <artifactId>indriya</artifactId>
@@ -297,6 +312,7 @@
             <artifactId>maven-surefire-common</artifactId>
             <version>2.22.2</version>
         </dependency>
+
     </dependencies>
 
 </project>
