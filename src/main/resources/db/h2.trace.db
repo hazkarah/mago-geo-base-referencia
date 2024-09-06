@@ -1,0 +1,3 @@
+2024-08-02 00:52:32.088697Z jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TESTE_MODEL" not found (this database is empty); SQL statement:
+select count(tm1_0.id) from teste_model tm1_0 [42104-224]

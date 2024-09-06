@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.gov.go.mago.geobasereferencia.model.LimiteEstado;
-import br.gov.go.mago.geobasereferencia.repository.LimiteEstadoRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.LimiteEstadoRepository;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2

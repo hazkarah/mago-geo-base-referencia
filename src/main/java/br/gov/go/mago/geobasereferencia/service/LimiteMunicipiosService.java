@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import br.gov.go.mago.geobasereferencia.model.LimiteMunicipios;
 import br.gov.go.mago.geobasereferencia.model.dto.GeometriaPontoDTO;
-import br.gov.go.mago.geobasereferencia.repository.LimiteMunicipiosRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.LimiteMunicipiosRepository;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2

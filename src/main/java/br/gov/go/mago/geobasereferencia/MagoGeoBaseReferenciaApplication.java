@@ -13,18 +13,17 @@ import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import br.gov.go.mago.car.core.CoreApplication;
+import br.gov.go.mago.car.core.security.CarCoreSecuritySemadGO;
 import br.gov.go.mago.car.domain.CarCoreDomain;
 import br.gov.go.mago.geobasereferencia.config.ApplicationPropertiesConfig;
 
 
-
 @SpringBootApplication(exclude = { ElasticsearchRestClientAutoConfiguration.class, LiquibaseAutoConfiguration.class })
-@Import(value = { CoreApplication.class, CarCoreDomain.class})
+@Import(value = { CoreApplication.class, CarCoreDomain.class, CarCoreSecuritySemadGO.class })
 @EnableScheduling
 @EnableCaching
 @EnableConfigurationProperties( value = { ApplicationPropertiesConfig.class } )
-@EnableJpaRepositories(basePackages = {"br.gov.go.mago.geobasereferencia.jpa"},repositoryImplementationPostfix = "Impl", queryLookupStrategy=QueryLookupStrategy.Key.USE_DECLARED_QUERY )
-// @EnableElasticsearchRepositories(basePackages= {"br.gov.go.mago.geobasereferencia.repository.elasticsearch"}, repositoryImplementationPostfix = "Impl", queryLookupStrategy=QueryLookupStrategy.Key.USE_DECLARED_QUERY)
+@EnableJpaRepositories(basePackages = {"br.gov.go.mago.geobasereferencia.repository.jpa"},repositoryImplementationPostfix = "Impl", queryLookupStrategy=QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND )
 public class MagoGeoBaseReferenciaApplication {
 
 

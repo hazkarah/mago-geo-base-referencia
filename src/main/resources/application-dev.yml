@@ -1,73 +1,172 @@
-#Context
 server:
-  servlet:
-    context-path: /
-  port: 8087
-
-
-#Database
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  port: ${SERVER_PORT:8087}
 spring:
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  application:
+    name: '@artifactId@'
+    version: '@version@'
+  devtools:
+    restart:
+      enabled: ${DEVTOOLS_ENABLED:true}
+      log-condition-evaluation-delta: false
+    add-properties: true
   datasource:
-    driver-class-name: oracle.jdbc.OracleDriver
-    url: 'jdbc:oracle:thin:@scan-prod:1521/oramago'
-    username: SIGA2_BASE_REFERENCIA_GEO
-    password: "Guaxupita#SIGA2_BASE"
+    url: ${JPA_DATASOURCE_URL:jdbc:postgresql://localhost:5432/semad_car}
+    username: ${JPA_DATASOURCE_USERNAME:postgres}
+    password: ${JPA_DATASOURCE_PASSWORD:postgres}
+    driverClassName: ${JPA_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+    hikari:
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 1800000
+      maximumPoolSize: 5
+      minimumIdle: 2
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+  elasticsearch:
+    uris: ${ELASTICSEARCH_HOST_PORT:localhost:9200}
+    username: ${ELASTICSEARCH_USER:admin}
+    password: ${ELASTICSEARCH_PASSWORD:"#Admin123$"}
+  sql:
+    init:
+      platform: ${JPA_DATASOURCE_PLATFORM:postgres}
+      mode: ${SQL_INIT_MODE:always}
+      schema-locations: classpath:db/init/0-0-0-shema.sql
+      data-locations: classpath:db/init/*-data.sql
+      continue-on-error: true
+      encoding: UTF-8
+  h2:
+    console:
+      enabled: false
   jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: false
-    database: oracle
     open-in-view: false
-    generate-ddl: off
+    defer-datasource-initialization: true
+    database-platform: ${JPA_DATASOURCE_PLATFORM}
+    hibernate:
+      ddl-auto: ${JPA_HIBERNATE_DDL:none}
     properties:
-      hibernate:
-        dialect: org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect
-        default_schema: BASE_REFERENCIA_GEO
-        format_sql: true
-        spatial:
-          connection_finder: br.gov.go.mago.geobasereferencia.config.OracleConnectionFinderConfig
+      hibernate: #Manual config @see SpringDataJPAConfig (adicionar propriedades na classe manualmente)
+        boot:
+          allow_jdbc_metadata_acces: true
+        default_schema: ${JPA_DATASOURCE_SCHEMA:public}
+        default_catalog: ${JPA_DATASOURCE_DATABASE_NAME:semad_car}
+        ddl-auto: ${JPA_HIBERNATE_DDL:none}
+        hbm2ddl.auto: ${JPA_HIBERNATE_DDL}
+        search:
+          enabled: ${JPA_HIBERNATE_SEARCH_ENABLED:true}
+          schema_management:
+            strategy: create-or-update
+          backend:
+            version_check:
+              enabled: true
+            type: elasticsearch
+            hosts: ${ELASTICSEARCH_HOST_PORT:localhost:9200}
+            protocol: ${ELASTICSEARCH_PROTOCOL:http}
+            username: ${ELASTICSEARCH_USER:admin}
+            password: ${ELASTICSEARCH_PASSWORD:"#Admin123$"}
+            layout:
+              strategy: ${ELASTICSEARCH_LAYOUT_STRATEGY:class:br.gov.go.mago.car.domain.config.HibernateElasticSearchLayoutStrategyConfig}
+            discovery:
+              enabled: true
+              refresh_interval: 60
+            analysis:
+              configurer: class:br.gov.go.mago.car.domain.config.ElasticsearchCustomAnalysisConfigurer
+          # # disabled for outbox-pooling
+            # indexing:
+            #   plan:
+            #     synchronization:
+            #       strategy: write-sync
+          coordination:
+            strategy: outbox-polling
+            entity:
+              mapping:
+                agent:
+                  catalog: ${JPA_DATASOURCE_DATABASE_NAME:semad_car}
+                  schema: HIBERNATE
+                  table: HSEARCH_AGENT
+                  uuid_gen_strategy: time
+                  uuid_type: UUID
+                outboxevent:
+                  catalog: ${JPA_DATASOURCE_DATABASE_NAME:semad_car}
+                  schema: HIBERNATE
+                  table: HSEARCH_OUTBOX_EVENT
+                  uuid_gen_strategy: time
+                  uuid_type: UUID
+            event_processor:
+              batch_size: 50
+              enabled: true
+              polling_interval: 10000
+              pulse_expiration: 48000
+              pulse_interval: 15000
+              retry_delay: 15
+              transaction_timeout: 10
 
-#Logging
-logging:
-  level:
-    net:
-      sf:
-        ehcache: debug
-    br:
-      gov.go.mago.geoportalbasereferencia: debug
-    org:
-      springframework:
-        web: debug
+
+  freemarker:
+    check-template-location: false
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      username: ${REDIS_USER:}
+      password: ${REDIS_PASSWORD:}
+      # username: redis
+      # password: redis
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_password:guest}
+  # Liquibase
+  liquibase:
+    enabled: ${LIQUIBASE_ENABLED:false}
 
 
+# Logging
+logging.level:
+  br.gov.go.mago.car: ${LOGGING_LEVEL:INFO}
+  org.hibernate.SQL: DEBUG
+  org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
+  org.hibernate.search: INFO
+  org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingEventProcessor: INFO
+  org.hibernate.search.elasticsearch.request: INFO
+  org.springframework.web.filter: TRACE
+  # org.elasticsearch.client: DEBUG
+  org.elasticsearch.client.RestClient: INFO
+  org.apache.http: INFO
 
-#Security
+
+# core
+core:
+  api:
+    carcara:
+      url: ${STORAGE_URL}
+
+# security
 security:
-  authorization:
-    token:
-      authorizationCookie:
-        cookieName: br.gov.go.mago.dev.authorization
-        domainName: apps.ocp.mago.go.gov.br
-        httpOnly: true
-        secure: false
-      identityCookie:
-        cookieName: br.gov.go.mago.dev.identity
-      keys:
-        accessTokenKey: BXt36hQvrmLOBsxHW2JcIQybZPrMzAtK
-        refreshTokenKey: GzZory0W5DaHpV5yWBrUcoqhv008at5I
-      storage:
-        redis:
-          namespace: br.gov.go.mago.AuthenticatedUser
-          host: redis-desenv.apps.ocp.mago.go.gov.br
-          port: 6379
-          password: V40vCkLhdhVJ2qS5
-  accessControl:
-    allowOrigins: '*'
-  identityService:
-    uri: http://api.portal-server-desenv.apps.ocp.mago.go.gov.br
+  enabled: true
+  issuer: mago-portal
+  type: jwt
+  jwt:
+    secret-key: 9083b208-9593-4110-b0db-7975bc471337-48268ccb-2579-4fba-9852-d59e25f887cd
+    refresh-key: 9083b208-9593-4110-b0db-7975bc471337-48268ccb-2579-4fba-9852-d59e25f887cd
+    exp-time: 3600
+  oauth2:
+    resource:
+        tokenInfoUri: ${authorization-server.uri:"http://10.207.30.9:8080/authorization-server"}
+  origens-permitidas:
+    - "*"
 
-geoserver:
-  url: 'http://geo.mago.go.gov.br/geoserver/ows?service=wms'
-  authToken: 541085de-9a2e-454e-bdba-eb3d57a2f492
+# app
+app:
+  tenantId: DEFAULT
+  tasks:
+    TaskElasticReindexJob:
+      enabled: true
+      cron: "* */2 * * * *"
+      fixedRate: 2147483647
+      tenantId: DEFAULT
+      params:
+        startAt: "2024-08-16T00:00:00Z"
+

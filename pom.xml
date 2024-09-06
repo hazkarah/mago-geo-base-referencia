@@ -33,7 +33,8 @@
         <car-core-web.version>0.0.1-SNAPSHOT</car-core-web.version>
         <car-core-security.version>0.0.1-SNAPSHOT</car-core-security.version>
         <car-core-security-semad-go.version>0.0.1-SNAPSHOT</car-core-security-semad-go.version>
-
+        <liquibase-maven-plugin.version>4.29.0</liquibase-maven-plugin.version>
+        <liquibase.version>4.29.0</liquibase.version>
         <javassist.version>3.21.0-GA</javassist.version>
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -43,6 +44,9 @@
         <maven.help.plugin.version>3.2.0</maven.help.plugin.version>
         <modelmapper.version>2.3.6</modelmapper.version>
         <jsoup.version>1.12.1</jsoup.version>
+        <spring-data-elasticsearch-compat.version>5.3.2</spring-data-elasticsearch-compat.version>
+        <jakarta-persistence.version>3.2.0</jakarta-persistence.version>
+        <start-class>br.gov.go.mago.geobasereferencia.MagoGeoBaseReferenciaApplication</start-class>
 
     </properties>
 
@@ -72,51 +76,38 @@
     </repositories>
 
 
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-            <!-- display active profile in compile phase -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-help-plugin</artifactId>
-                <version>${maven.help.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>show-profiles</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>active-profiles</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.amashchenko.maven.plugin</groupId>
-                <artifactId>gitflow-maven-plugin</artifactId>
-                <version>1.19.0</version>
-                <configuration>
-                    <!-- optional configuration -->
-                    <versionsForceUpdate>true</versionsForceUpdate>
-                    <fetchRemote>false</fetchRemote>
-                    <allowSnapshots>true</allowSnapshots>
-                    <useSnapshotInRelease>true</useSnapshotInRelease>
-                </configuration>
-            </plugin>
-        </plugins>
 
-    </build>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-elasticsearch</artifactId>
+                <version>${spring-data-elasticsearch-compat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate-orm.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.logging</groupId>
+                        <artifactId>jboss-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.persistence</groupId>
+                <artifactId>jakarta.persistence-api</artifactId>
+                <version>${jakarta-persistence.version}</version>
+            </dependency>
+            <dependency>
+				<groupId>org.jboss.logging</groupId>
+				<artifactId>jboss-logging</artifactId>
+				<version>${jboss-logging.version}</version>
+			</dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
     <dependencies>
 
@@ -150,14 +141,6 @@
             <artifactId>car-core-security-semad-go</artifactId>
             <version>${car-core-security-semad-go.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.10.1</version>
-            <type>maven-plugin</type>
-        </dependency>
-
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-spatial</artifactId>
@@ -222,7 +205,7 @@
             <artifactId>si-quantity</artifactId>
             <version>2.0.1</version>
         </dependency>
-  
+
         <dependency>
             <groupId>tech.units</groupId>
             <artifactId>indriya</artifactId>
@@ -291,12 +274,62 @@
             </exclusions>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>maven-surefire-common</artifactId>
-            <version>2.22.2</version>
-        </dependency>
     </dependencies>
+
+    <build>
+        <finalName>mago-geo-base-referencia</finalName>
+        <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>${start-class}</mainClass>
+                    <layout>JAR</layout>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>${start-class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
 
 </project>

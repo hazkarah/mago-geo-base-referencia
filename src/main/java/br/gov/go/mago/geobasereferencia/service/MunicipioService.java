@@ -5,8 +5,6 @@ import java.util.List;
 import org.locationtech.jts.geom.Geometry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.AdviceMode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,14 +15,13 @@ import br.gov.go.mago.car.core.web.exception.BusinessEntityNotFoundException;
 import br.gov.go.mago.geobasereferencia.model.LimiteMunicipios;
 import br.gov.go.mago.geobasereferencia.model.Municipio;
 import br.gov.go.mago.geobasereferencia.model.dto.GeometriaPontoDTO;
-import br.gov.go.mago.geobasereferencia.repository.LimiteMunicipiosRepository;
-import br.gov.go.mago.geobasereferencia.repository.MunicipioRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.LimiteMunicipiosRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.MunicipioRepository;
 import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2
 @Transactional(rollbackFor = Throwable.class)
-@EnableCaching(mode = AdviceMode.ASPECTJ)
 public class MunicipioService {
 
     @Autowired

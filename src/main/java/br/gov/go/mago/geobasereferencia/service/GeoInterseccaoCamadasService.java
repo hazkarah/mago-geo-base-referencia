@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.wololo.jts2geojson.GeoJSONReader;
 
@@ -24,20 +25,18 @@ import br.gov.go.mago.geobasereferencia.model.UnidadesConservacaoZonaAmortecimen
 import br.gov.go.mago.geobasereferencia.model.dto.GeometriaDTO;
 import br.gov.go.mago.geobasereferencia.model.dto.ResultadoRestricaoPontoGeo;
 import br.gov.go.mago.geobasereferencia.model.dto.ValidacaoPontoDTO;
-import br.gov.go.mago.geobasereferencia.repository.AreasUsoRestritoRepository;
-import br.gov.go.mago.geobasereferencia.repository.BaciaHidrograficaRepository;
-import br.gov.go.mago.geobasereferencia.repository.GeomorfologiaIbgeMTRepository;
-import br.gov.go.mago.geobasereferencia.repository.ProvinciaHidrologicaRepository;
-import br.gov.go.mago.geobasereferencia.repository.TIAmortecimentoRepository;
-import br.gov.go.mago.geobasereferencia.repository.TerrasIndigenasRepository;
-import br.gov.go.mago.geobasereferencia.repository.UnidadeConservacaoRepository;
-import br.gov.go.mago.geobasereferencia.repository.UnidadeConservacaoZonaAmortecimentoRepository;
-import lombok.AllArgsConstructor;
-import lombok.extern.apachecommons.CommonsLog;
+import br.gov.go.mago.geobasereferencia.repository.jpa.AreasUsoRestritoRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.BaciaHidrograficaRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.GeomorfologiaIbgeGORepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.ProvinciaHidrologicaRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.TIAmortecimentoRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.TerrasIndigenasRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.UnidadeConservacaoRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.UnidadeConservacaoZonaAmortecimentoRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@CommonsLog
-@AllArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class GeoInterseccaoCamadasService {
 
     private final TerrasIndigenasRepository terrasIndigenasRepository;
@@ -50,7 +49,7 @@ public class GeoInterseccaoCamadasService {
 
     private final UnidadeConservacaoZonaAmortecimentoRepository unidadeConservacaoZonaAmortecimentoRepository;
 
-    private final GeomorfologiaIbgeMTRepository geomorfologiaIbgeMTRepository;
+    private final GeomorfologiaIbgeGORepository geomorfologiaIbgeMTRepository;
 
     private final AreasUsoRestritoRepository areasUsoRestritoRepository;
 

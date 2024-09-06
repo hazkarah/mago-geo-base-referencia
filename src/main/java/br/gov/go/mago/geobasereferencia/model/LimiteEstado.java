@@ -30,9 +30,9 @@ public class LimiteEstado implements Serializable {
 
     @Id
     @Column(name = "OBJECTID")
-    
-    @GeneratedValue(generator = "SEQLimiteEstadoGO", strategy = GenerationType.SEQUENCE)
-    @GenericGenerator(name = "SEQLimiteEstadoGO", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator")
+
+    @GeneratedValue(generator = "SEQLimiteEstado", strategy = GenerationType.SEQUENCE)
+    @GenericGenerator(name = "SEQLimiteEstado", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator")
     private Integer objectId;
 
     @Column(name = "ESTADO", length = 50)

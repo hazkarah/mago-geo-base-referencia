@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.gov.go.mago.geobasereferencia.model.LimiteEstado;
-import br.gov.go.mago.geobasereferencia.model.dto.LimiteEstadoGODTO;
+import br.gov.go.mago.geobasereferencia.model.dto.LimiteEstadoDTO;
 import br.gov.go.mago.geobasereferencia.service.LimiteEstadoService;
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -30,10 +30,10 @@ public class LimiteEstadoController {
     @Operation(summary = "Retorna um polígono de município no qual o mesmo intersecta com uma coordenada.",
             description = "Recebe uma coordenada geográfica e retorna um polígono")
     // @AuthorizationTokenNotRequired
-    public ResponseEntity<?> findLimiteEstadoMTByIntersectsGeometry(@RequestBody Geometry geometry) {
+    public ResponseEntity<?> findLimiteEstadoByIntersectsGeometry(@RequestBody Geometry geometry) {
         List<LimiteEstado> listaLimitesEstadoMT = service.findByIntersectsGeometry(geometry);
         if (listaLimitesEstadoMT != null) {
-            return ResponseEntity.ok(listaLimitesEstadoMT.stream().map(LimiteEstadoGODTO::new).collect(Collectors.toList()));
+            return ResponseEntity.ok(listaLimitesEstadoMT.stream().map(LimiteEstadoDTO::new).collect(Collectors.toList()));
         } else {
             return ResponseEntity.notFound().build();
         }

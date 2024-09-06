@@ -5,49 +5,178 @@ info:
     description: '@description@'
     version: '@version@'
 
-#Context
 server:
-  servlet:
-    context-path: /
-  port: 8080
-
-  tomcat:
-    connection-timeout: 120000
-    keep-alive-timeout: 120000
-    max-wait: 100
-    max-active: 50
-    max-idle: 20
-    min-idle: 15
-
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  port: ${SERVER_PORT:8087}
 spring:
   application:
     name: '@artifactId@'
     version: '@version@'
-  mvc:
-    throw-exception-if-no-handler-found: true
-  output:
-    ansi:
-      enabled: ALWAYS
-  jackson:
-    serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
-  servlet:
-    multipart:
-      enabled: true
-      file-size-threshold: 2KB
-      max-file-size: 30MB
-      max-request-size: 30MB
+  profiles:
+    active: ${APP_ENV}
+  devtools:
+    restart:
+      enabled: ${DEVTOOLS_ENABLED:true}
+      log-condition-evaluation-delta: false
+    add-properties: true
   datasource:
-      hikari:
-        connection-timeout: ${DATABASE_CONNECTION_TIMEOUT:60000}
-        minimum-idle: ${DATABASE_CONNECTION_MININUM_IDLE:10}
-        maximum-pool-size: ${DATABASE_CONNECTION_MAX_POOL_SIZE:50}
-        idle-timeout: ${DATABASE_CONNECTION_IDLE_TIMEOUT:60000}
-        max-lifetime: ${DATABASE_CONNECTION_MAX_LIFETIME:240000}
-        data-source-properties:
-          oracle.net.CONNECT_TIMEOUT: ${DATABASE_CONNECTION_TIMEOUT:120000}
-          oracle.net.READ_TIMEOUT: ${DATABASE_READ_TIMEOUT:240000}
-          oracle.jdbc.ReadTimeout: ${DATABASE_READ_TIMEOUT:240000}
+    url: ${JPA_DATASOURCE_URL:jdbc:postgresql://localhost:5432/semad_car}
+    username: ${JPA_DATASOURCE_USERNAME:postgres}
+    password: ${JPA_DATASOURCE_PASSWORD:postgres}
+    driverClassName: ${JPA_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+    hikari:
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 1800000
+      maximumPoolSize: 5
+      minimumIdle: 2
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+  elasticsearch:
+    uris: ${ELASTICSEARCH_HOST_PORT:localhost:9200}
+    username: ${ELASTICSEARCH_USER:admin}
+    password: ${ELASTICSEARCH_PASSWORD:"#Admin123$"}
+  sql:
+    init:
+      platform: ${JPA_DATASOURCE_PLATFORM:postgres}
+      mode: ${SQL_INIT_MODE:always}
+      schema-locations: optional:classpath*:db/init/*schema*.sql
+      data-locations: optional:classpath*:db/init/*data*.sql
+      continue-on-error: true
+      encoding: UTF-8
+  h2:
+    console:
+      enabled: false
+  jpa:
+    open-in-view: false
+    defer-datasource-initialization: true
+    database-platform: ${JPA_DATASOURCE_PLATFORM}
+    hibernate:
+      ddl-auto: ${JPA_HIBERNATE_DDL:none}
+    properties:
+      hibernate: #Manual config @see SpringDataJPAConfig (adicionar propriedades na classe manualmente)
+        boot:
+          allow_jdbc_metadata_acces: true
+        default_schema: ${JPA_DATASOURCE_SCHEMA:public}
+        default_catalog: ${JPA_DATASOURCE_DATABASE_NAME:car}
+        ddl-auto: ${JPA_HIBERNATE_DDL:none}
+        hbm2ddl.auto: ${JPA_HIBERNATE_DDL}
+        search:
+          enabled: ${JPA_HIBERNATE_SEARCH_ENABLED:true}
+          schema_management:
+            strategy: create-or-update
+          backend:
+            version_check:
+              enabled: true
+            type: elasticsearch
+            hosts: ${ELASTICSEARCH_HOST_PORT:localhost:9200}
+            protocol: ${ELASTICSEARCH_PROTOCOL:http}
+            username: ${ELASTICSEARCH_USER:admin}
+            password: ${ELASTICSEARCH_PASSWORD:"#Admin123$"}
+            layout:
+              strategy: ${ELASTICSEARCH_LAYOUT_STRATEGY:"class:br.gov.go.mago.car.domain.config.HibernateElasticSearchLayoutStrategyConfig"}
+            discovery:
+              enabled: true
+              refresh_interval: 60
+            analysis:
+              configurer: class:br.gov.go.mago.car.domain.config.ElasticsearchCustomAnalysisConfigurer
+          # # disabled for outbox-pooling
+            # indexing:
+            #   plan:
+            #     synchronization:
+            #       strategy: write-sync
+          coordination:
+            strategy: outbox-polling
+            entity:
+              mapping:
+                agent:
+                  catalog: ${JPA_DATASOURCE_DATABASE_NAME}
+                  schema: HIBERNATE
+                  table: HSEARCH_AGENT
+                  uuid_gen_strategy: time
+                  uuid_type: UUID
+                outboxevent:
+                  catalog: ${JPA_DATASOURCE_DATABASE_NAME}
+                  schema: HIBERNATE
+                  table: HSEARCH_OUTBOX_EVENT
+                  uuid_gen_strategy: time
+                  uuid_type: UUID
+            event_processor:
+              batch_size: 50
+              enabled: true
+              polling_interval: 10000
+              pulse_expiration: 48000
+              pulse_interval: 15000
+              retry_delay: 15
+              transaction_timeout: 10
+
+
+  freemarker:
+    check-template-location: false
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      username: ${REDIS_USER:}
+      password: ${REDIS_PASSWORD:}
+      # username: redis
+      # password: redis
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_password:guest}
+  # Liquibase
+  liquibase:
+    enabled: ${LIQUIBASE_ENABLED:false}
+
+
+# Logging
+logging.level:
+  br.gov.go.mago.car: ${LOGGING_LEVEL:INFO}
+  org.hibernate.SQL: INFO
+  org.hibernate.search: INFO
+  org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingEventProcessor: INFO
+  org.hibernate.search.elasticsearch.request: INFO
+  org.springframework.web.filter: TRACE
+  # org.elasticsearch.client: DEBUG
+  org.elasticsearch.client.RestClient: INFO
+  org.apache.http: INFO
+
+
+# core
+core:
+  api:
+    carcara:
+      url: ${STORAGE_URL}
+
+# security
+security:
+  enabled: true
+  issuer: mago-portal
+  type: jwt
+  jwt:
+    secret-key: 9083b208-9593-4110-b0db-7975bc471337-48268ccb-2579-4fba-9852-d59e25f887cd
+    refresh-key: 9083b208-9593-4110-b0db-7975bc471337-48268ccb-2579-4fba-9852-d59e25f887cd
+    exp-time: 3600
+  oauth2:
+    resource:
+        tokenInfoUri: ${authorization-server.uri:"http://10.207.30.9:8080/authorization-server"}
+  origens-permitidas:
+    - "*"
+
+# app
+app:
+  tenantId: DEFAULT
+  tasks:
+    TaskElasticReindexJob:
+      enabled: true
+      cron: "* */2 * * * *"
+      fixedRate: 2147483647
+      tenantId: DEFAULT
+      params:
+        startAt: "2024-08-16T00:00:00Z"
 
 format:
   data: '"dd-MM-yyyy hh:mm:ss"'

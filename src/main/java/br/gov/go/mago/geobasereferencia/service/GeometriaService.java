@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import br.gov.go.mago.geobasereferencia.config.GeoserverPropertiesConfig;
 import br.gov.go.mago.geobasereferencia.model.AreaGeometria;
 import br.gov.go.mago.geobasereferencia.model.dto.CamadaDTO;
-import br.gov.go.mago.geobasereferencia.repository.GeometriaRepository;
+import br.gov.go.mago.geobasereferencia.repository.jpa.GeometriaRepository;
 import lombok.extern.apachecommons.CommonsLog;
 
 @Service
