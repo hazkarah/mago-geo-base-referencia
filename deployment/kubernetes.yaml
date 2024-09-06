@@ -1,0 +1,164 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "${APPLICATION_NAME}"
+data:
+  SERVER_ADDRESS: 0.0.0.0
+  SERVER_PORT: "8080"
+  APP_PROFILE: dev,worker,job
+  APP_ENV: dev,worker,job
+  LOGGING_LEVEL: DEBUG
+  ELASTICSEARCH_HOST_PORT: semadhml009:9200
+  ELASTICSEARCH_LAYOUT_STRATEGY: class:br.gov.go.mago.car.domain.config.HibernateElasticSearchLayoutStrategyConfig
+  SQL_INIT_MODE: "always"
+  JPA_DATASOURCE_TYPE: POSTGRESQL
+  JPA_HIBERNATE_DOMAIN_DDL: update
+  JPA_DATASOURCE_DOMAIN_SHOWSQL: "true"
+  JPA_HIBERNATE_DDL: update
+  JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+  JPA_HIBERNATE_SEARCH_ENABLED: "true"
+  JPA_DATASOURCE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+  JPA_DATASOURCE_DATABASE_NAME: semad_car
+  JPA_DATASOURCE_URL: jdbc:postgresql://semadhml009:5432/semad_car
+  JPA_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+  JPA_DATASOURCE_SCHEMA: public
+  JPA_DATASOURCE_SHOWSQL: "true"
+  JPA_DATASOURCE_DOMAIN_URL: jdbc:postgresql://semadhml009:5432/semad_car
+  JPA_DATASOURCE_DOMAIN_DRIVER_CLASS_NAME: org.postgresql.Driver
+  REDIS_HOST: semadhml009
+  RABBITMQ_HOST: semadhml009
+  KAFKA_HOSTS: semadhml009:9092
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "${APPLICATION_NAME}"
+type: Opaque
+stringData:
+  JPA_DATASOURCE_USERNAME: postgres
+  JPA_DATASOURCE_PASSWORD: postgres
+  JPA_DATASOURCE_DOMAIN_USERNAME: postgres
+  JPA_DATASOURCE_DOMAIN_PASSWORD: postgres
+  # ELASTICSEARCH_USER:
+  # ELASTICSEARCH_PASSWORD:
+  # REDIS_USER:
+  # REDIS_PASSWORD:
+  RABBITMQ_USER: guest
+  RABBITMQ_PASSWORD: guest
+  KAFKA_USER: admin
+  KAFKA_PASSWORD: "#Admin123$"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "${APPLICATION_NAME}"
+spec:
+  selector:
+    app: "${APPLICATION_NAME}"
+  type: ClusterIP
+  ports:
+    - name: 80-tcp
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "${APPLICATION_NAME}"
+  labels:
+    app: "${APPLICATION_NAME}"
+spec:
+  selector:
+    matchLabels:
+      app: "${APPLICATION_NAME}"
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: "${APPLICATION_NAME}"
+    spec:
+      containers:
+        - name: "${APPLICATION_NAME}"
+          image: ${IMAGE_TAG}
+          envFrom:
+            - configMapRef:
+                name: "${APPLICATION_NAME}"
+                optional: true
+            - secretRef:
+                name: "${APPLICATION_NAME}"
+                optional: true
+          resources:
+            requests:
+              cpu: 500m
+              memory: 500Mi
+            limits:
+              cpu: 1500m
+              memory: 2000Mi
+            # livenessProbe:
+            #   tcpSocket:
+            #     port: 8080
+            #   initialDelaySeconds: 5
+            #   timeoutSeconds: 5
+            #   successThreshold: 1
+            #   failureThreshold: 3
+            #   periodSeconds: 10
+            # readinessProbe:
+            #   httpGet:
+            #     path: /actuator/health
+            #     port: 8080
+            #   initialDelaySeconds: "5"
+            #   timeoutSeconds: "2"
+            #   successThreshold: "1"
+            #   failureThreshold: "3"
+            #   periodSeconds: "10"
+      restartPolicy: Always
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    app: ${APPLICATION_NAME}
+    app.kubernetes.io/instance: ${APPLICATION_NAME}
+  name: tls-cert-${APPLICATION_NAME}.${FQDN}
+spec:
+  dnsNames:
+    - api.car.${FQDN}
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  secretName: tls-cert-${APPLICATION_NAME}.${FQDN}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "${APPLICATION_NAME}"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.car.${FQDN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${APPLICATION_NAME}
+                port:
+                  name: 80-tcp
+  tls:
+    - hosts:
+        - api.car.${FQDN}
+      secretName: tls-cert-${APPLICATION_NAME}.${FQDN}
