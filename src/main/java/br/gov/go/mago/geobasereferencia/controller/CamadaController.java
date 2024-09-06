@@ -31,6 +31,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,6 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.gov.go.mago.geobasereferencia.config.GeoserverPropertiesConfig;
 import br.gov.go.mago.geobasereferencia.model.dto.CamadaDTO;
+import br.gov.go.mago.geobasereferencia.model.dto.GeoJSONParamsDTO;
 import br.gov.go.mago.geobasereferencia.util.Utils;
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -129,6 +132,19 @@ public class CamadaController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
+    @Operation(summary ="Busca o link do metadados da camada")
+    @PostMapping(path = "geojson", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getJsonFromServer(@RequestBody GeoJSONParamsDTO geoJSONParamsDTO) {
+        try {
+            final HashMap body = getJSON(geoJSONParamsDTO.getUrl());
+            return ResponseEntity.ok(body);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
     @Operation(summary ="Busca o link do metadados da camada")
     @GetMapping(path = "metadado", produces = { MediaType.APPLICATION_JSON_VALUE })

@@ -11,7 +11,7 @@ spring:
       log-condition-evaluation-delta: false
     add-properties: true
   datasource:
-    url: ${JPA_DATASOURCE_URL:jdbc:postgresql://localhost:5432/semad_car}
+    url: ${JPA_DATASOURCE_URL:jdbc:postgresql://192.168.151.215:5432/semad_car}
     username: ${JPA_DATASOURCE_USERNAME:postgres}
     password: ${JPA_DATASOURCE_PASSWORD:postgres}
     driverClassName: ${JPA_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
@@ -27,7 +27,7 @@ spring:
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
   elasticsearch:
-    uris: ${ELASTICSEARCH_HOST_PORT:localhost:9200}
+    uris: ${ELASTICSEARCH_HOST_PORT:192.168.151.215:9200}
     username: ${ELASTICSEARCH_USER:admin}
     password: ${ELASTICSEARCH_PASSWORD:"#Admin123$"}
   sql:
@@ -63,7 +63,7 @@ spring:
             version_check:
               enabled: true
             type: elasticsearch
-            hosts: ${ELASTICSEARCH_HOST_PORT:localhost:9200}
+            hosts: ${ELASTICSEARCH_HOST_PORT:192.168.151.215:9200}
             protocol: ${ELASTICSEARCH_PROTOCOL:http}
             username: ${ELASTICSEARCH_USER:admin}
             password: ${ELASTICSEARCH_PASSWORD:"#Admin123$"}
@@ -109,13 +109,13 @@ spring:
     check-template-location: false
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:192.168.151.215}
       username: ${REDIS_USER:}
       password: ${REDIS_PASSWORD:}
       # username: redis
       # password: redis
   rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
+    host: ${RABBITMQ_HOST:192.168.151.215}
     username: ${RABBITMQ_USER:guest}
     password: ${RABBITMQ_password:guest}
   # Liquibase
@@ -156,7 +156,7 @@ security:
     resource:
         tokenInfoUri: ${authorization-server.uri:"http://10.207.30.9:8080/authorization-server"}
   origens-permitidas:
-    - "*"
+    - "http://web.car.local.meioambiente.go.gov.br:44200,https://web.car.homolog.meioambiente.go.gov.br,http://web.car.homolog.meioambiente.go.gov.br"
 
 # app
 app:
